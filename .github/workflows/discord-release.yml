@@ -10,5 +10,7 @@ permissions:
 jobs:
   announce:
     uses: ./.github/workflows/discord-release-reusable.yml
+    with:
+      project_name: "HelloThere Logs"
     secrets:
       FANTASTIQLABS_DISCORD_WEBHOOK: ${{ secrets.FANTASTIQLABS_DISCORD_WEBHOOK }}
