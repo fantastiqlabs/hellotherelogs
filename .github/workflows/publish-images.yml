@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -138,47 +139,14 @@ jobs:
   announce-discord:
     needs: [choose-runner, publish]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.publish.result == 'success'
-    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
-    steps:
-      - name: Post image card
-        shell: bash
-        env:
-          FANTASTIQLABS_DISCORD_WEBHOOK: ${{ secrets.FANTASTIQLABS_DISCORD_WEBHOOK }}
-          PROJECT_NAME: Hello There Logs
-          IMAGE_TAGS: |
-            ghcr.io/fantastiqlabs/hellotherelogs-backend:latest
-            ghcr.io/fantastiqlabs/hellotherelogs-backend:sha-${{ github.sha }}
-            ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest
-            ghcr.io/fantastiqlabs/hellotherelogs-frontend:sha-${{ github.sha }}
-          COMMIT_SHA: ${{ github.sha }}
-          COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-        run: |
-          set -euo pipefail
-
-          if [[ -z "$FANTASTIQLABS_DISCORD_WEBHOOK" ]]; then
-            echo "Discord webhook secret is empty." >&2
-            exit 1
-          fi
-
-          images="${IMAGE_TAGS:0:900}"
-          short_sha="${COMMIT_SHA:0:12}"
-          payload="$(jq -n \
-            --arg project "$PROJECT_NAME" \
-            --arg images "$images" \
-            --arg sha "$short_sha" \
-            --arg commit_url "$COMMIT_URL" \
-            '{embeds:[{title:$project,url:$commit_url,description:"A new image build passed and is available in GitHub Container Registry.",color:5793266,fields:[{name:"Images",value:$images},{name:"Source commit",value:("["+$sha+"]("+$commit_url+")"),inline:true}],footer:{text:"GHCR image published • deployment status is separate"}}],allowed_mentions:{parse:[]}}')"
-
-          set +e
-          status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
-            --connect-timeout 10 --max-time 30 \
-            --header 'Content-Type: application/json' \
-            --data-binary "$payload" \
-            "$FANTASTIQLABS_DISCORD_WEBHOOK" 2>/dev/null)"
-          curl_status=$?
-          set -e
-
-          if [[ $curl_status -ne 0 || ! "$status" =~ ^2[0-9][0-9]$ ]]; then
-            echo "Discord image announcement failed (HTTP ${status:-no response}); webhook URL was withheld." >&2
-            exit 1
-          fi
+    uses: fantastiqlabs/agentastiq/.github/workflows/discord-image-reusable.yml@main
+    with:
+      project_name: Hello There Logs
+      image_tags: |
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:sha-${{ github.sha }}
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:sha-${{ github.sha }}
+      commit_sha: ${{ github.sha }}
+      commit_url: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+    secrets: inherit
