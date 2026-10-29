@@ -22,7 +22,7 @@ jobs:
 
   validate-build:
     needs: choose-runner
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target' || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
     permissions:
       contents: read
@@ -31,6 +31,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Validate Unraid Compose configuration
+        run: docker compose --env-file .env.unraid.example -f docker-compose.unraid.yml config --quiet
 
       - name: Record frontend build time
         id: build_info
@@ -60,7 +63,7 @@ jobs:
 
   publish:
     needs: choose-runner
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
     permissions:
       contents: read
