@@ -1,7 +1,7 @@
 services:
   backend:
-    image: ${HELLOTHERELOGS_BACKEND_IMAGE:-ghcr.io/fantastiqlabs/hellotherelogs-backend:latest}
-    container_name: hellotherelogs-backend
+    image: ${LOGTASTIQ_BACKEND_IMAGE:-${HELLOTHERELOGS_BACKEND_IMAGE:-ghcr.io/fantastiqlabs/logtastiq-backend:latest}}
+    container_name: logtastiq-backend
     environment:
       DATABASE_URL: sqlite:////data/hellotherelogs.sqlite3
       CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-900}
@@ -11,16 +11,16 @@ services:
       WCL_GRAPHQL_URL: ${WCL_GRAPHQL_URL:-https://fresh.warcraftlogs.com/api/v2/client}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:8080}
     volumes:
-      - ${HELLOTHERELOGS_DATA_PATH:-/mnt/user/appdata/logtastiq/data}:/data
+      - ${LOGTASTIQ_DATA_PATH:-${HELLOTHERELOGS_DATA_PATH:-/mnt/user/appdata/logtastiq/data}}:/data
     expose:
       - "8000"
     restart: unless-stopped
 
   frontend:
-    image: ${HELLOTHERELOGS_FRONTEND_IMAGE:-ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest}
-    container_name: hellotherelogs-frontend
+    image: ${LOGTASTIQ_FRONTEND_IMAGE:-${HELLOTHERELOGS_FRONTEND_IMAGE:-ghcr.io/fantastiqlabs/logtastiq-frontend:latest}}
+    container_name: logtastiq-frontend
     ports:
-      - "${HELLOTHERELOGS_PORT:-8080}:80"
+      - "${LOGTASTIQ_PORT:-${HELLOTHERELOGS_PORT:-8080}}:80"
     depends_on:
       - backend
     restart: unless-stopped

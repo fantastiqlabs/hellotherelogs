@@ -11,6 +11,6 @@ jobs:
   announce:
     uses: ./.github/workflows/discord-release-reusable.yml
     with:
-      project_name: "HelloThere Logs"
+      project_name: "Logtastiq"
     secrets:
       FANTASTIQLABS_DISCORD_WEBHOOK: ${{ secrets.FANTASTIQLABS_DISCORD_WEBHOOK }}
