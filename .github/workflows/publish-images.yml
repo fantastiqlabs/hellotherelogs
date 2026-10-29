@@ -134,3 +134,18 @@ jobs:
             VITE_APP_BUILD_DATE=${{ steps.build_info.outputs.date }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
+
+  announce-discord:
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.publish.result == 'success'
+    uses: fantastiqlabs/agentastiq/.github/workflows/discord-image-reusable.yml@main
+    with:
+      project_name: Hello There Logs
+      image_tags: |
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:sha-${{ github.sha }}
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:sha-${{ github.sha }}
+      commit_sha: ${{ github.sha }}
+      commit_url: "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+    secrets: inherit
