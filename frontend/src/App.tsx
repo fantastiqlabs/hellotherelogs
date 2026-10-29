@@ -449,7 +449,7 @@ function Header({ connected }: { connected?: boolean }) {
   const buildDate = import.meta.env.VITE_APP_BUILD_DATE || 'local build'
   const buildDateLabel = buildDate.length >= 16 ? `${buildDate.slice(0, 10)} ${buildDate.slice(11, 16)} UTC` : buildDate
   return <header className="topbar">
-    <a className="brand" href="/"><span className="brand-mark"><Command size={17} /></span><span>hellotherelogs</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
+    <a className="brand" href="/"><span className="brand-mark"><Command size={17} /></span><span>Logtastiq</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
     <div className="topbar-tools"><AppearanceControls />
     {connected !== undefined && <div className="system-status"><span className={`status-dot ${connected ? 'online' : ''}`} /> API {connected ? 'CONNECTED' : 'OFFLINE'}</div>}
     </div>
@@ -1238,7 +1238,7 @@ function Stat({ icon, label, value, tint }: { icon: ReactNode; label: string; va
 }
 
 function Footer() {
-  return <footer><span>HELLOTHERELOGS <span className="muted">· SELF-HOSTED RAID ANALYTICS</span></span><span>WCL CREDENTIALS STAY SERVER-SIDE</span></footer>
+  return <footer><span>Logtastiq <span className="muted">· Turn Warcraft Logs into clear next steps.</span></span><span>WCL CREDENTIALS STAY SERVER-SIDE</span></footer>
 }
 
 export default function App() {

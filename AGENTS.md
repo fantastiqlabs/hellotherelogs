@@ -8,7 +8,7 @@
 
 ## Project structure
 
-hellotherelogs is a self-hosted Warcraft Logs Fresh report analysis app. The FastAPI service is in `backend/app/`: routes in `api/`, settings and database setup in `core/`, and WCL access, normalization, and caching in `services/`. Put backend tests and reusable response fixtures in `backend/tests/`. The React/TypeScript client and styles live in `frontend/src/`; Vite and nginx configuration live in `frontend/`. Compose and deployment settings belong at the repository root.
+Logtastiq is a self-hosted Warcraft Logs Fresh report analysis app. Its tagline is “Turn Warcraft Logs into clear next steps.” The FastAPI service is in `backend/app/`: routes in `api/`, settings and database setup in `core/`, and WCL access, normalization, and caching in `services/`. Put backend tests and reusable response fixtures in `backend/tests/`. The React/TypeScript client and styles live in `frontend/src/`; Vite and nginx configuration live in `frontend/`. Compose and deployment settings belong at the repository root.
 
 ## Development commands
 

@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "hellotherelogs"
+    app_name: str = "Logtastiq"
     wcl_client_id: str = ""
     wcl_client_secret: str = ""
     wcl_token_url: str = "https://www.warcraftlogs.com/oauth/token"
