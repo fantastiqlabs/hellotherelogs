@@ -89,7 +89,7 @@ jobs:
         id: backend_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ghcr.io/steffenlongva/hellotherelogs-backend
+          images: ghcr.io/fantastiqlabs/hellotherelogs-backend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=long
@@ -111,7 +111,7 @@ jobs:
         id: frontend_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ghcr.io/steffenlongva/hellotherelogs-frontend
+          images: ghcr.io/fantastiqlabs/hellotherelogs-frontend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=long

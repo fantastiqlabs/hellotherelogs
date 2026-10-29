@@ -6,8 +6,8 @@ hellotherelogs is a self-hosted Warcraft Logs Classic Fresh report reader. It lo
 
 Unraid can run the prebuilt app images from GitHub Container Registry (GHCR); it does not need WSL or a local build toolchain. The repository workflow builds and publishes separate `linux/amd64` backend and frontend images to:
 
-- `ghcr.io/steffenlongva/hellotherelogs-backend`
-- `ghcr.io/steffenlongva/hellotherelogs-frontend`
+- `ghcr.io/fantastiqlabs/hellotherelogs-backend`
+- `ghcr.io/fantastiqlabs/hellotherelogs-frontend`
 
 Pushes to `main` publish the `latest` tag and a commit-specific `sha-...` tag. Version tags such as `v1.2.0` publish matching image tags. Pull requests build both images without publishing them.
 
