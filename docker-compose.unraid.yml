@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ${HELLOTHERELOGS_BACKEND_IMAGE:-ghcr.io/steffenlongva/hellotherelogs-backend:latest}
+    image: ${HELLOTHERELOGS_BACKEND_IMAGE:-ghcr.io/fantastiqlabs/hellotherelogs-backend:latest}
     container_name: hellotherelogs-backend
     environment:
       DATABASE_URL: sqlite:////data/hellotherelogs.sqlite3
@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ${HELLOTHERELOGS_FRONTEND_IMAGE:-ghcr.io/steffenlongva/hellotherelogs-frontend:latest}
+    image: ${HELLOTHERELOGS_FRONTEND_IMAGE:-ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest}
     container_name: hellotherelogs-frontend
     ports:
       - "${HELLOTHERELOGS_PORT:-8080}:80"

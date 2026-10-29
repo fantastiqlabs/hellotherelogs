@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -22,7 +23,7 @@ jobs:
 
   validate-build:
     needs: choose-runner
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target' || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
     permissions:
       contents: read
@@ -31,6 +32,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Validate Unraid Compose configuration
+        run: docker compose --env-file .env.unraid.example -f docker-compose.unraid.yml config --quiet
 
       - name: Record frontend build time
         id: build_info
@@ -60,7 +64,7 @@ jobs:
 
   publish:
     needs: choose-runner
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
     permissions:
       contents: read
@@ -89,7 +93,7 @@ jobs:
         id: backend_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ghcr.io/steffenlongva/hellotherelogs-backend
+          images: ghcr.io/fantastiqlabs/hellotherelogs-backend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=long
@@ -111,7 +115,7 @@ jobs:
         id: frontend_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ghcr.io/steffenlongva/hellotherelogs-frontend
+          images: ghcr.io/fantastiqlabs/hellotherelogs-frontend
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=long
@@ -131,3 +135,18 @@ jobs:
             VITE_APP_BUILD_DATE=${{ steps.build_info.outputs.date }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
+
+  announce-discord:
+    needs: [choose-runner, publish]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.publish.result == 'success'
+    uses: fantastiqlabs/agentastiq/.github/workflows/discord-image-reusable.yml@main
+    with:
+      project_name: Hello There Logs
+      image_tags: |
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-backend:sha-${{ github.sha }}
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest
+        ghcr.io/fantastiqlabs/hellotherelogs-frontend:sha-${{ github.sha }}
+      commit_sha: ${{ github.sha }}
+      commit_url: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+    secrets: inherit
