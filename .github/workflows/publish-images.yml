@@ -139,14 +139,77 @@ jobs:
   announce-discord:
     needs: [choose-runner, publish]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.publish.result == 'success'
-    uses: fantastiqlabs/agentastiq/.github/workflows/discord-image-reusable.yml@main
-    with:
-      project_name: Hello There Logs
-      image_tags: |
-        ghcr.io/fantastiqlabs/hellotherelogs-backend:latest
-        ghcr.io/fantastiqlabs/hellotherelogs-backend:sha-${{ github.sha }}
-        ghcr.io/fantastiqlabs/hellotherelogs-frontend:latest
-        ghcr.io/fantastiqlabs/hellotherelogs-frontend:sha-${{ github.sha }}
-      commit_sha: ${{ github.sha }}
-      commit_url: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-    secrets: inherit
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runs_on) }}
+    steps:
+      - name: Post changelog card
+        shell: bash
+        env:
+          FANTASTIQLABS_DISCORD_WEBHOOK: "${{ secrets.FANTASTIQLABS_DISCORD_WEBHOOK }}"
+          GITHUB_TOKEN: "${{ github.token }}"
+          GITHUB_REPOSITORY: "${{ github.repository }}"
+          GITHUB_RUN_ID: "${{ github.run_id }}"
+          PROJECT_NAME: "Hello There Logs"
+          COMMIT_SHA: "${{ github.sha }}"
+          COMMIT_URL: "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$FANTASTIQLABS_DISCORD_WEBHOOK" ]]; then
+            echo "Discord webhook secret is empty." >&2
+            exit 1
+          fi
+
+          short_sha="${COMMIT_SHA:0:12}"
+          headers=(-H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2022-11-28')
+          current_run="$(curl --fail --silent --show-error \
+            --connect-timeout 10 --max-time 30 \
+            "${headers[@]}" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")"
+          workflow_id="$(jq -er '.workflow_id' <<<"$current_run")"
+          successful_runs="$(curl --fail --silent --show-error \
+            --connect-timeout 10 --max-time 30 \
+            "${headers[@]}" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow_id}/runs?branch=main&status=success&per_page=100")"
+          previous_sha="$(jq -r --argjson current "$GITHUB_RUN_ID" \
+            '[.workflow_runs[] | select(.id < $current) | .head_sha][0] // empty' \
+            <<<"$successful_runs")"
+
+          if [[ -n "$previous_sha" && "$previous_sha" != "$COMMIT_SHA" ]]; then
+            comparison="$(curl --fail --silent --show-error \
+              --connect-timeout 10 --max-time 30 \
+              "${headers[@]}" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/compare/${previous_sha}...${COMMIT_SHA}")"
+            changelog="$(jq -r '[.commits[] | .commit.message | split("\n")[0] | .[:140] | "- " + .] | .[-15:] | join("\n")' <<<"$comparison")"
+            if [[ -z "$changelog" ]]; then
+              changelog="No source changes were detected since the previous image build."
+            fi
+          elif [[ -n "$previous_sha" ]]; then
+            changelog="No source changes were detected since the previous image build."
+          else
+            changelog="First image build for this workflow. See the source commit below."
+          fi
+
+          description="$(printf 'Changes since the previous image build:\n\n%s' "$changelog")"
+          description="${description:0:3800}"
+          payload="$(jq -n \
+            --arg project "$PROJECT_NAME" \
+            --arg sha "$short_sha" \
+            --arg commit_url "$COMMIT_URL" \
+            --arg description "$description" \
+            '{embeds:[{title:($project+" update"),url:$commit_url,description:$description,color:5793266,fields:[{name:"Source commit",value:("["+$sha+"]("+$commit_url+")"),inline:true}],footer:{text:"GHCR image published • deployment status is separate"}}],allowed_mentions:{parse:[]}}')"
+
+          set +e
+          status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --connect-timeout 10 --max-time 30 \
+            --header 'Content-Type: application/json' \
+            --data-binary "$payload" \
+            "$FANTASTIQLABS_DISCORD_WEBHOOK" 2>/dev/null)"
+          curl_status=$?
+          set -e
+
+          if [[ $curl_status -ne 0 || ! "$status" =~ ^2[0-9][0-9]$ ]]; then
+            echo "Discord image announcement failed (HTTP ${status:-no response}); webhook URL was withheld." >&2
+            exit 1
+          fi
