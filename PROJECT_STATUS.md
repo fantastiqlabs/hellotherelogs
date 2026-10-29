@@ -1,10 +1,10 @@
-# Project status and handoff
+# Logtastiq project status and handoff
 
-This file is the persistent handoff for contributors continuing hellotherelogs. Read it with `AGENTS.md` before implementation work, then update it when the project state changes.
+This file is the persistent handoff for contributors continuing Logtastiq. Read it with `AGENTS.md` before implementation work, then update it when the project state changes.
 
 ## Product
 
-hellotherelogs is a self-hosted Warcraft Logs Fresh raid analysis app, currently aimed at Classic Fresh reports. The user wants a guild improvement tool with raid-wide and per-player views: damage, healing, ability/buff uptime, deaths, interrupts, and practical suggestions. The intent is to keep expanding this into an evidence-led review tool, not just a report viewer.
+Logtastiq is a self-hosted Warcraft Logs Fresh raid analysis app, currently aimed at Classic Fresh reports. The user wants a guild improvement tool with raid-wide and per-player views: damage, healing, ability/buff uptime, deaths, interrupts, and practical suggestions. The intent is to keep expanding this into an evidence-led review tool, not just a report viewer.
 
 ## Current state
 
@@ -12,7 +12,7 @@ hellotherelogs is a self-hosted Warcraft Logs Fresh raid analysis app, currently
 - Optional Live updates mode checks a public WCL report every 30/60/120/300 seconds while the tab is active. The report page can change/disable the interval (stored in its URL), keeps the selected pull, and retains loaded data on background errors. `GET /reports/{code}?refresh=true` bypasses the overview cache, updates the shared fights cache, and invalidates analysis for changed fights; the UI keys selected analysis by fight metadata. Benchmark cohorts remain cached and are not polled. This requires an external uploader updating the same report; it does not upload game logs. Late event corrections without changed fight metadata still follow normal analysis cache expiry.
 - The React/TypeScript frontend lives in `frontend/`; the FastAPI backend lives in `backend/`.
 - Docker Compose serves the frontend through nginx on host port 8080 by default. Nginx proxies `/api` to FastAPI inside Compose. The root Compose file builds locally for development; `docker-compose.unraid.yml` pulls the published amd64 images from GHCR for server deployment.
-- `.github/workflows/publish-images.yml` builds backend and frontend images on pull requests and publishes them on pushes to `main` and version tags. Main builds publish `latest` and commit SHA tags. GHCR packages under the personal account default to private; an admin must explicitly make both packages public for anonymous Unraid pulls, or configure registry login on Unraid for private pulls.
+- `.github/workflows/publish-images.yml` builds backend and frontend images on pull requests and publishes them on pushes to `main` and version tags. Main builds publish `latest` and commit SHA tags. GHCR packages under the Fantastiq Labs organization default to private; an admin must explicitly make both packages public for anonymous Unraid pulls, or configure registry login on Unraid for private pulls.
 - Unraid uses `.env.unraid.example` as a template for backend WCL credentials and deployment settings. `docker-compose.unraid.yml` stores SQLite under `/mnt/user/appdata/logtastiq/data` by default. Compose Manager Plus can pull scheduled GHCR image updates; confirm plugin compatibility with the installed Unraid version.
 - Warcraft Logs V2 OAuth client credentials are loaded only in the backend. The user confirmed that valid V2 credentials fixed token acquisition and public Fresh reports now load. Do not ask the user to paste credentials and never inspect or commit `.env` contents.
 - The report page shows report metadata, boss progression, attempts, and trash fights.
