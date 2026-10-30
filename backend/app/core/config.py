@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     wcl_client_secret: str = ""
     wcl_token_url: str = "https://www.warcraftlogs.com/oauth/token"
     wcl_graphql_url: str = "https://fresh.warcraftlogs.com/api/v2/client"
+    # Keep this cache filename during the brand change to avoid an empty-cache reset.
     database_url: str = "sqlite:///./data/hellotherelogs.sqlite3"
     cache_ttl_seconds: int = 900
     frontend_origin: str = "http://localhost:8080"

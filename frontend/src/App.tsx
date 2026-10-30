@@ -10,7 +10,7 @@ import './themes.css'
 import './live-updates.css'
 import { changeLiveInterval, defaultSessionMinutes, isLiveSessionActive, readLiveSession, refreshIntervals, sessionDurations, startLiveSession } from './live-session'
 import { bossGuideFor, type BossGuide } from './boss-guides'
-import { Activity, ArrowLeft, ArrowUpRight, Check, CircleHelp, Clock3, Command, ExternalLink, LoaderCircle, Shield, Skull, Swords, Trophy } from 'lucide-react'
+import { Activity, ArrowLeft, ArrowUpRight, Check, CircleHelp, Clock3, ExternalLink, LoaderCircle, ScrollText, Shield, Skull, Swords, Trophy } from 'lucide-react'
 
 type Health = { status: string; service: string }
 type Fight = {
@@ -426,22 +426,23 @@ function formatDate(date: string): string {
 
 function AppearanceControls() {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('htl-theme')
-    return ['dark', 'light', 'catppuccin-mocha', 'tokyo-night', 'nord', 'hellothere', 'oiler', 'freedom', 'sotabror'].includes(saved ?? '') ? saved as string : 'dark'
+    const saved = localStorage.getItem('logtastiq-theme') ?? localStorage.getItem('htl-theme')
+    if (saved === 'hellothere') return 'logtastiq'
+    return ['dark', 'light', 'catppuccin-mocha', 'tokyo-night', 'nord', 'logtastiq', 'oiler', 'freedom', 'sotabror'].includes(saved ?? '') ? saved as string : 'dark'
   })
   const [fontScale, setFontScale] = useState(() => {
-    const stored = Number(localStorage.getItem('htl-font-scale-v2'))
+    const stored = Number(localStorage.getItem('logtastiq-font-scale-v2') ?? localStorage.getItem('htl-font-scale-v2'))
     return Number.isFinite(stored) && stored >= 0.9 && stored <= 1.3 ? stored : 1.1
   })
   useEffect(() => {
     document.body.dataset.theme = theme
     document.documentElement.style.setProperty('--font-scale', String(fontScale))
-    localStorage.setItem('htl-theme', theme)
-    localStorage.setItem('htl-font-scale-v2', String(fontScale))
+    localStorage.setItem('logtastiq-theme', theme)
+    localStorage.setItem('logtastiq-font-scale-v2', String(fontScale))
   }, [theme, fontScale])
   return <div className="appearance-controls" aria-label="Display settings">
     <label className="font-scale-control" title="Adjust interface text size"><span>A</span><input aria-label="Text size" type="range" min="0.9" max="1.3" step="0.05" value={fontScale} onChange={(event) => setFontScale(Number(event.target.value))} /><span className="large-a">A</span></label>
-    <label className="theme-picker"><span className="sr-only">Color theme</span><select className="theme-toggle" aria-label="Color theme" value={theme} onChange={(event) => setTheme(event.target.value)}><option value="dark">Dark</option><option value="light">Light</option><option value="catppuccin-mocha">Catppuccin Mocha</option><option value="tokyo-night">Tokyo Night</option><option value="nord">Nord</option><option value="hellothere">Hellothere</option><option value="oiler">Oiler</option><option value="freedom">FREEDOM</option><option value="sotabror">SOTABROR</option></select></label>
+    <label className="theme-picker"><span className="sr-only">Color theme</span><select className="theme-toggle" aria-label="Color theme" value={theme} onChange={(event) => setTheme(event.target.value)}><option value="dark">Dark</option><option value="light">Light</option><option value="catppuccin-mocha">Catppuccin Mocha</option><option value="tokyo-night">Tokyo Night</option><option value="nord">Nord</option><option value="logtastiq">Logtastiq</option><option value="oiler">Oiler</option><option value="freedom">FREEDOM</option><option value="sotabror">SOTABROR</option></select></label>
   </div>
 }
 
@@ -449,7 +450,7 @@ function Header({ connected }: { connected?: boolean }) {
   const buildDate = import.meta.env.VITE_APP_BUILD_DATE || 'local build'
   const buildDateLabel = buildDate.length >= 16 ? `${buildDate.slice(0, 10)} ${buildDate.slice(11, 16)} UTC` : buildDate
   return <header className="topbar">
-    <a className="brand" href="/"><span className="brand-mark"><Command size={17} /></span><span>Logtastiq</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
+    <a className="brand" href="/" aria-label="Logtastiq home"><span className="brand-mark"><ScrollText size={17} /></span><span>Logtastiq</span><span className="version" title={`Built ${buildDate}`}>BUILD / {(import.meta.env.VITE_APP_VERSION || 'local').slice(0, 7)} · {buildDateLabel}</span></a>
     <div className="topbar-tools"><AppearanceControls />
     {connected !== undefined && <div className="system-status"><span className={`status-dot ${connected ? 'online' : ''}`} /> API {connected ? 'CONNECTED' : 'OFFLINE'}</div>}
     </div>
@@ -1238,7 +1239,7 @@ function Stat({ icon, label, value, tint }: { icon: ReactNode; label: string; va
 }
 
 function Footer() {
-  return <footer><span>Logtastiq <span className="muted">· Turn Warcraft Logs into clear next steps.</span></span><span>WCL CREDENTIALS STAY SERVER-SIDE</span></footer>
+  return <footer><span>LOGTASTIQ <span className="muted">· Turn Warcraft Logs into clear next steps.</span></span><span>WARCRAFT LOGS CREDENTIALS STAY SERVER-SIDE</span></footer>
 }
 
 export default function App() {

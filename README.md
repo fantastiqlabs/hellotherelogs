@@ -1,5 +1,7 @@
 # Logtastiq
 
+**Turn Warcraft Logs into clear next steps.**
+
 Logtastiq is a self-hosted Warcraft Logs Classic Fresh report reader. It loads public report data through the Fresh Warcraft Logs GraphQL API; Warcraft Logs credentials remain in FastAPI and are never sent to the browser.
 
 ## Deploy on Unraid
@@ -39,7 +41,7 @@ Enter a personal access token (classic) with `read:packages` when prompted. Dock
 2. Copy `.env.example` to `.env`, then set `WCL_CLIENT_ID` and `WCL_CLIENT_SECRET`.
 3. Run `docker compose up --build -d` from this directory.
 4. Open `http://localhost:8080` on the local machine. If running Docker inside WSL 2, localhost forwarding is usually available; otherwise get the WSL address with `hostname -I` inside Ubuntu and open `http://WSL_ADDRESS:8080` from Windows. Set `LOGTASTIQ_PORT` to change the host port or `LOGTASTIQ_BIND_ADDRESS` to change the bind address.
-5. Visit `/api/health` to check the API. Compose persists SQLite data in the `hellotherelogs_data` volume.
+5. Visit `/api/health` to check the Logtastiq API. Compose keeps its existing SQLite volume name so current cache data remains available.
 
 ## Local development
 
