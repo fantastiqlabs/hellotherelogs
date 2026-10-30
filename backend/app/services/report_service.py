@@ -8,7 +8,7 @@ from app.services.wcl_client import WCLClient
 
 
 REPORT_QUERY = """
-query HelloThereLogsReport($code: String!) {
+query LogtastiqReport($code: String!) {
   reportData {
     report(code: $code) {
       code
@@ -35,7 +35,7 @@ query HelloThereLogsReport($code: String!) {
 """
 
 REPORT_FIGHTS_QUERY = """
-query HelloThereLogsReportFights($code: String!) {
+query LogtastiqReportFights($code: String!) {
   reportData {
     report(code: $code) {
       code
@@ -57,7 +57,7 @@ query HelloThereLogsReportFights($code: String!) {
 """
 
 FIGHT_ANALYSIS_QUERY = """
-query HelloThereLogsFightAnalysis($code: String!, $fightId: Int!__PLAYER_BUFF_VARIABLES__) {
+query LogtastiqFightAnalysis($code: String!, $fightId: Int!__PLAYER_BUFF_VARIABLES__) {
   reportData {
     report(code: $code) {
       code
@@ -262,7 +262,7 @@ def _recent_rankings_query(sources: list[dict[str, str]], encounter_id: int, dif
             f"{{ encounterRankings(compare: Parses, difficulty: $difficulty, encounterID: $encounterId, "
             f"includeOtherPlayers: true, byBracket: true, size: $size, specName: $spec{index}, timeframe: Today) }}"
         )
-    query = f"query HelloThereLogsRecentPeerRankings({', '.join(definitions)}) {{ characterData {{ {' '.join(fields)} }} }}"
+    query = f"query LogtastiqRecentPeerRankings({', '.join(definitions)}) {{ characterData {{ {' '.join(fields)} }} }}"
     return query, variables
 
 
@@ -312,7 +312,7 @@ def _ranking_candidate(row: dict[str, Any]) -> dict[str, Any] | None:
 
 
 FRIENDLY_DAMAGE_PAGE_QUERY = """
-query HelloThereLogsFriendlyDamagePage($code: String!, $fightId: Int!, $sourceId: Int!, $startTime: Float!) {
+query LogtastiqFriendlyDamagePage($code: String!, $fightId: Int!, $sourceId: Int!, $startTime: Float!) {
   reportData {
     report(code: $code) {
       friendlyDamagePage: events(dataType: DamageDone, fightIDs: [$fightId], sourceID: $sourceId, startTime: $startTime, limit: 10000, useActorIDs: true, useAbilityIDs: true) { data nextPageTimestamp }
@@ -322,7 +322,7 @@ query HelloThereLogsFriendlyDamagePage($code: String!, $fightId: Int!, $sourceId
 """
 
 BOSS_DEBUFF_PAGE_QUERY = """
-query HelloThereLogsBossDebuffPage($code: String!, $fightId: Int!, $startTime: Float!) {
+query LogtastiqBossDebuffPage($code: String!, $fightId: Int!, $startTime: Float!) {
   reportData {
     report(code: $code) {
       bossDebuffPage: events(dataType: Debuffs, fightIDs: [$fightId], hostilityType: Enemies, startTime: $startTime, limit: 10000, useActorIDs: true, useAbilityIDs: true) { data nextPageTimestamp }
@@ -332,7 +332,7 @@ query HelloThereLogsBossDebuffPage($code: String!, $fightId: Int!, $startTime: F
 """
 
 ENCOUNTER_RANKINGS_QUERY = """
-query HelloThereLogsEncounterBenchmarks($encounterId: Int!, $difficulty: Int!, $size: Int!) {
+query LogtastiqEncounterBenchmarks($encounterId: Int!, $difficulty: Int!, $size: Int!) {
   worldData {
     encounter(id: $encounterId) {
       id
@@ -344,7 +344,7 @@ query HelloThereLogsEncounterBenchmarks($encounterId: Int!, $difficulty: Int!, $
 """
 
 BENCHMARK_REPORT_QUERY = """
-query HelloThereLogsBenchmarkReport($code: String!, $fightId: Int!) {
+query LogtastiqBenchmarkReport($code: String!, $fightId: Int!) {
   reportData {
     report(code: $code) {
       code

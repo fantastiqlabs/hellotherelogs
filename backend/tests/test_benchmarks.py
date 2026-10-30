@@ -39,7 +39,7 @@ class BenchmarkClient:
     async def query(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
         if query == REPORT_QUERY:
             return {"reportData": {"report": _selected_report()}}
-        if query.lstrip().startswith("query HelloThereLogsFightAnalysis"):
+        if query.lstrip().startswith("query LogtastiqFightAnalysis"):
             self.analysis_query = query
             self.analysis_variables = variables
             return {"reportData": {"report": {
@@ -60,7 +60,7 @@ class BenchmarkClient:
                 {"report": {"code": "PeerA123", "fightID": 10}, "duration": 60, "guild": "Peer A", "rankPercent": 92},
                 {"report": {"code": "PeerB123", "fightID": 20}, "duration": 60, "guild": "Peer B", "rankPercent": 88},
             ]})}}}
-        if query.lstrip().startswith("query HelloThereLogsRecentPeerRankings"):
+        if query.lstrip().startswith("query LogtastiqRecentPeerRankings"):
             return {"characterData": {
                 "player0": {"encounterRankings": {"rankings": [{"report": {"code": "PeerA123", "fightID": 10}, "rankPercent": 92}]}},
                 "player1": {"encounterRankings": {"rankings": [{"report": {"code": "PeerA123", "fightID": 10}, "rankPercent": 88}]}},

@@ -1,7 +1,7 @@
 services:
   backend:
     build: ./backend
-    container_name: hellotherelogs-backend
+    container_name: logtastiq-backend
     environment:
       DATABASE_URL: sqlite:////data/hellotherelogs.sqlite3
       CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-900}
@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
   frontend:
     build: ./frontend
-    container_name: hellotherelogs-frontend
+    container_name: logtastiq-frontend
     ports:
       - "${LOGTASTIQ_BIND_ADDRESS:-${HELLOTHERELOGS_BIND_ADDRESS:-0.0.0.0}}:${LOGTASTIQ_PORT:-${HELLOTHERELOGS_PORT:-8080}}:80"
     depends_on:
